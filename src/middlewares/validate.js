@@ -1,4 +1,3 @@
-const { registerSchema, loginSchema, refreshTokenSchema } = require('../modules/auth/auth.validation');
 const { BadRequestError } = require('../utils/errors');
 
 const validate = (schema) => {

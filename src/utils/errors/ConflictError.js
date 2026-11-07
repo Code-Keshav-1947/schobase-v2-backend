@@ -5,3 +5,5 @@ class ConflictError extends AppError {
         super(message, 409);
     }
 }
+
+module.exports = ConflictError;
