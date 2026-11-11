@@ -25,13 +25,28 @@ model User {
   username  String   @unique
   password  String
   role      Role     @default(STUDENT)
+  refreshTokens RefreshToken[]
   student   Student?
   teacher  Teacher?
   schoolAdmin SchoolAdmin?
   admin     Admin?
   profile   Profile?
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt 
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  tokenHash     String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  expiresAt DateTime
+  revokeAt DateTime?
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Profile {
@@ -89,6 +104,8 @@ model School {
   id        String   @id @default(cuid())
   name      String
   address   String
+  email     String   @unique
+  phone     String   @unique
   students  Student[]
   teachers  Teacher[]
   schoolAdmins SchoolAdmin[]

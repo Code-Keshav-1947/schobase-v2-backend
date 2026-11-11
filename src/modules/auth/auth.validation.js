@@ -10,8 +10,8 @@ const refreshTokenSchema = z.object({
     refreshToken: z.string().min(1).trim(),
 });
 
+
 module.exports = {
-    registerSchema,
     loginSchema,
     refreshTokenSchema,
 };
