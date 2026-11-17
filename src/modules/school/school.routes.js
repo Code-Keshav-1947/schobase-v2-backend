@@ -21,12 +21,7 @@ router.patch(
   controller.updateSchool
 );
 
-router.delete(
-  "/:id",
-  roleBasedAccess(["ADMIN"]),
-  validate(validation.deleteSchoolSchema),
-  controller.deleteSchool
-);
+router.delete("/:id", roleBasedAccess(["ADMIN"]), controller.deleteSchool);
 
 router.get(
   "/:id",

@@ -106,8 +106,8 @@ model School {
   address   String
   email     String   @unique
   phone     String   @unique
-  website   String   @unique 
-  establishedYear Int 
+  website   String?  
+  establishedYear Int? 
   students  Student[]
   teachers  Teacher[]
   schoolAdmins SchoolAdmin[]

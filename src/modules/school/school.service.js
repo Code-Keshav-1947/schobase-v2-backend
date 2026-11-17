@@ -7,6 +7,7 @@ const createSchool = async (schoolData) => {
     });
     return school;
   } catch (error) {
+    console.error("Error creating school:", error);
     throw new Error("Error creating school");
   }
 };

@@ -24,6 +24,14 @@ const login = async (identifier, password) => {
     throw new UnauthorizedError("Invalid credentials");
   }
   let profileInstance;
+  if (user.role === "ADMIN") {
+    profileInstance = await db.admin.findUnique({
+      where: { userId: user.id },
+    });
+    if (!profileInstance) {
+      throw new UnauthorizedError("Admin not found");
+    }
+  }
   if (user.role === "SCHOOL_ADMIN") {
     profileInstance = await db.schoolAdmin.findUnique({
       where: { userId: user.id },
