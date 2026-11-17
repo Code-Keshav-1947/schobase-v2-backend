@@ -1,20 +1,22 @@
 const express = require("express");
 const errorHandler = require("./middlewares/errorHandler");
 const { NotFoundError } = require("./utils/errors");
-const authRoutes = require("./modules/auth/auth.routes");
-const studentRoutes = require("./modules/student/student.routes");
 const db = require("./modules/prisma/db");
 const cookieParser = require("cookie-parser");
 
+// Import route modules
+const authRoutes = require("./modules/auth/auth.routes");
+const studentRoutes = require("./modules/student/student.routes");
+const schoolRoutes = require("./modules/school/school.routes");
 
 // Connect to the database
 db.$connect()
-.then(() => {
-  console.log("Database connected successfully");
-})
-.catch((err) => {
-  console.error("Database connection error:", err.message || err);
-});
+  .then(() => {
+    console.log("Database connected successfully");
+  })
+  .catch((err) => {
+    console.error("Database connection error:", err.message || err);
+  });
 
 const app = express();
 
@@ -36,6 +38,7 @@ app.get("/health", (req, res) => {
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/students", studentRoutes);
+app.use("/api/schools", schoolRoutes);
 
 // Catch 404 for undefined routes
 app.use((req, res, next) => {

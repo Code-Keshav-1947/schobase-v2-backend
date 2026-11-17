@@ -1,12 +1,12 @@
 const db = require("../prisma/db");
 const jwt = require("jsonwebtoken");
-const {  comparePasswords } = require("../../utils/password");
+const { comparePasswords } = require("../../utils/password");
 const { UnauthorizedError } = require("../../utils/errors");
 const { generateRefreshToken, hashRefreshToken } = require("../../utils/token");
 
 const User = db.user;
 
-const ACCESS_SECRET = process.env.ACCESS_TOKEN_SECRET 
+const ACCESS_SECRET = process.env.ACCESS_TOKEN_SECRET;
 
 const login = async (identifier, password) => {
   const user = await User.findFirst({
@@ -23,15 +23,46 @@ const login = async (identifier, password) => {
   if (!isPasswordValid) {
     throw new UnauthorizedError("Invalid credentials");
   }
+  let profileInstance;
+  if (user.role === "SCHOOL_ADMIN") {
+    profileInstance = await db.schoolAdmin.findUnique({
+      where: { userId: user.id },
+    });
+    if (!profileInstance) {
+      throw new UnauthorizedError("School admin not found");
+    }
+  }
+  if (user.role === "TEACHER") {
+    profileInstance = await db.teacher.findUnique({
+      where: { userId: user.id },
+    });
+    if (!profileInstance) {
+      throw new UnauthorizedError("Teacher not found");
+    }
+  }
+  if (user.role === "STUDENT") {
+    profileInstance = await db.student.findUnique({
+      where: { userId: user.id },
+    });
+    if (!profileInstance) {
+      throw new UnauthorizedError("Student not found");
+    }
+  }
+  const schoolId = profileInstance.schoolId;
 
   const accessToken = jwt.sign(
-    { userId: user.id, role: user.role },
+    {
+      userId: user.id,
+      role: user.role,
+      schoolId: schoolId,
+      profileInstanceId: profileInstance.id,
+    },
     ACCESS_SECRET,
     { expiresIn: "15m" }
   );
 
   const refreshToken = generateRefreshToken();
-  const hashedRefreshToken =  hashRefreshToken(refreshToken);
+  const hashedRefreshToken = hashRefreshToken(refreshToken);
   await db.refreshToken.create({
     data: {
       tokenHash: hashedRefreshToken,
@@ -41,7 +72,6 @@ const login = async (identifier, password) => {
   });
   return { accessToken, refreshToken };
 };
-
 
 const refreshToken = async (token) => {
   const hashedUserToken = hashRefreshToken(token);
@@ -62,26 +92,24 @@ const refreshToken = async (token) => {
   if (storedToken.expiresAt < new Date()) {
     throw new UnauthorizedError("Refresh token expired");
   }
-  
+
   const user = await User.findUnique({
     where: { id: storedToken.userId },
   });
-  
+
   if (!user) {
     throw new UnauthorizedError("User not found");
   }
 
-  
-  
   const result = await db.$transaction(async (tx) => {
     const revoked = await tx.refreshToken.updateMany({
       where: {
         id: storedToken.id,
         expiresAt: {
-          gt: new Date()
-        }
+          gt: new Date(),
+        },
       },
-      data: { revokeAt: new Date() }
+      data: { revokeAt: new Date() },
     });
 
     const newRefreshToken = generateRefreshToken();
@@ -94,14 +122,50 @@ const refreshToken = async (token) => {
       },
     });
     if (revoked.count !== 1) {
-      throw new UnauthorizedError("Refresh token is no longer valid or has been revoked");
+      throw new UnauthorizedError(
+        "Refresh token is no longer valid or has been revoked"
+      );
     }
     return newRefreshToken;
   });
 
+  let profileInstance;
+  let classId;
+  if (user.role === "SCHOOL_ADMIN") {
+    profileInstance = await db.schoolAdmin.findUnique({
+      where: { userId: user.id },
+    });
+    if (!profileInstance) {
+      throw new UnauthorizedError("School admin not found");
+    }
+  }
+  if (user.role === "TEACHER") {
+    profileInstance = await db.teacher.findUnique({
+      where: { userId: user.id },
+    });
+    if (!profileInstance) {
+      throw new UnauthorizedError("Teacher not found");
+    }
+  }
+  if (user.role === "STUDENT") {
+    profileInstance = await db.student.findUnique({
+      where: { userId: user.id },
+    });
+    if (!profileInstance) {
+      throw new UnauthorizedError("Student not found");
+    }
+  }
+  if (!profileInstance) {
+    throw new UnauthorizedError("Profile instance not found");
+  }
 
   const accessToken = jwt.sign(
-    { userId: user.id, role: user.role },
+    {
+      userId: user.id,
+      role: user.role,
+      schoolId: profileInstance.schoolId,
+      profileInstanceId: profileInstance.id,
+    },
     ACCESS_SECRET,
     { expiresIn: "15m" }
   );
@@ -120,7 +184,7 @@ const getMe = async (userId) => {
       updatedAt: true,
     },
   });
-  
+
   if (!user) {
     throw new UnauthorizedError("User not found");
   }
@@ -131,5 +195,5 @@ const getMe = async (userId) => {
 module.exports = {
   login,
   refreshToken,
-  getMe
+  getMe,
 };
