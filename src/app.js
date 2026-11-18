@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const authRoutes = require("./modules/auth/auth.routes");
 const studentRoutes = require("./modules/student/student.routes");
 const schoolRoutes = require("./modules/school/school.routes");
+const classRoutes = require("./modules/class/class.routes");
 
 // Connect to the database
 db.$connect()
@@ -38,6 +39,7 @@ app.get("/health", (req, res) => {
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/students", studentRoutes);
+app.use("/api/classes", classRoutes);
 app.use("/api/schools", schoolRoutes);
 
 // Catch 404 for undefined routes
