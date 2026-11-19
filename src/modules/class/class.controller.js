@@ -131,6 +131,7 @@ const getAllClassesForTeacher = async (req, res) => {
   try {
     const { teacherId } = req.params;
     const classes = await services.getAllClassesForTeacher(teacherId);
+    //TODO: Add role-based access control for this endpoint if needed
     res.status(200).json(classes);
   } catch (error) {
     res.status(400).json({ error: error.message });
