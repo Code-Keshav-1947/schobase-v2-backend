@@ -30,7 +30,6 @@ model User {
   teacher  Teacher?
   schoolAdmin SchoolAdmin?
   admin     Admin?
-  profile   Profile?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt 
 }
@@ -47,16 +46,6 @@ model RefreshToken {
 
   @@index([userId])
   @@index([expiresAt])
-}
-
-model Profile {
-  id        String   @id @default(cuid())
-  profilePicture String?
-  bio       String?
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Student {
