@@ -9,6 +9,7 @@ const authRoutes = require("./modules/auth/auth.routes");
 const studentRoutes = require("./modules/student/student.routes");
 const schoolRoutes = require("./modules/school/school.routes");
 const classRoutes = require("./modules/class/class.routes");
+const teacherRoutes = require("./modules/teacher/teacher.routes");
 
 // Connect to the database
 db.$connect()
@@ -41,7 +42,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/classes", classRoutes);
 app.use("/api/schools", schoolRoutes);
-
+app.use("/api/teachers", teacherRoutes);
 // Catch 404 for undefined routes
 app.use((req, res, next) => {
   next(new NotFoundError(`Route ${req.originalUrl} not found`));

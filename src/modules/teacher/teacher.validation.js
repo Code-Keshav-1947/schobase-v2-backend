@@ -11,7 +11,7 @@ const createTeacherSchema = z.object({
     .max(100),
   name: z.string().min(2, "Name must be at least 2 characters long").max(100),
   email: z.string().email("Please provide a valid email address"),
-  schoolId: z.string().uuid("Please provide a valid school ID"),
+  schoolId: z.string(),
 });
 
 const updateTeacherSchema = z.object({
