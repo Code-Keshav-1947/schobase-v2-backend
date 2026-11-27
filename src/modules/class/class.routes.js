@@ -10,34 +10,34 @@ router.use(authenticate);
 router.get("/", roleBasedAccess(["admin"]), classController.getAllClasses);
 router.get(
   "/:id",
-  roleBasedAccess(["admin", "schoolAdmin"]),
+  roleBasedAccess(["admin", "school_admin"]),
   classController.getClassById
 );
 router.post(
   "/",
-  roleBasedAccess(["admin", "schoolAdmin"]),
+  roleBasedAccess(["admin", "school_admin"]),
   validate(classSchema.createClassSchema),
   classController.createClass
 );
 router.put(
   "/:id",
-  roleBasedAccess(["admin", "schoolAdmin"]),
+  roleBasedAccess(["admin", "school_admin"]),
   validate(classSchema.updateClassSchema),
   classController.updateClass
 );
 router.delete(
   "/:id",
-  roleBasedAccess(["admin", "schoolAdmin"]),
+  roleBasedAccess(["admin", "school_admin"]),
   classController.deleteClass
 );
 router.get(
   "/school/:schoolId",
-  roleBasedAccess(["admin", "schoolAdmin"]),
+  roleBasedAccess(["admin", "school_admin"]),
   classController.getAllClassesForSchool
 );
 router.get(
   "/teacher/:teacherId",
-  roleBasedAccess(["admin", "schoolAdmin"]),
+  roleBasedAccess(["admin", "school_admin"]),
   classController.getAllClassesForTeacher
 );
 

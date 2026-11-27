@@ -98,7 +98,13 @@ const getAllClassesForSchool = async (schoolId) => {
 const getAllClassesForTeacher = async (teacherId) => {
   try {
     const classes = await prisma.class.findMany({
-      where: { teacherId },
+      where: {
+        teachers: {
+          some: {
+            id: teacherId,
+          },
+        },
+      },
     });
     return classes;
   } catch (error) {
